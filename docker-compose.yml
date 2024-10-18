@@ -1,0 +1,10 @@
+services:
+  myapp:
+    build: src
+    restart: always
+    volumes:
+      - ./src/app:/src/app
+    container_name: myapp
+    ports:
+      - 3000:3000
+    command: npm run start
