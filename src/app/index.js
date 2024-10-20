@@ -6,7 +6,7 @@ var http = require("http").Server(app);
 var io = require("socket.io")(http);
 
 app.use(express.json());
-app.use("/static", express.static(__dirname + "/public"));
+app.use("/assets", express.static(__dirname + "/public"));
 
 app.get("/", function (req, res) {
   res.sendFile(__dirname + "/html/index.html");

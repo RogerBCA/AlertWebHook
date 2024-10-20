@@ -148,6 +148,7 @@
       style="display: none; width: 0; height: 0; position: absolute"
       id="preloadImage"
     />
+    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
     <script
       src="https://code.jquery.com/jquery-3.7.1.min.js"
       integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
@@ -155,11 +156,12 @@
     ></script>
     <script>
       var settings = "";
-      $.getJSON("/static/settings.json", function (data) {
+      $.getJSON("/assets/settings.json", function (data) {
         settings = data;
       });
     </script>
-    <script src="/static/js/mediawrapper.js"></script>
+    <script src="/assets/js/tts.js"></script>
+    <script src="/assets/js/mediawrapper.js"></script>
     <script
       src="https://cdn.socket.io/4.7.5/socket.io.min.js"
       integrity="sha384-2huaZvOR9iDzHqslqwpR87isEmrfxqyWOF7hr7BY6KG0+hVKLoEXMPUJw3ynWuhO"
@@ -179,12 +181,12 @@
           profileId: 3,
           name: "Follow Alert",
           screenId: 1,
-          duration: 5,
+          duration: 10,
           amountToAdd: 0,
           imageUrl: null,
           audioUrl: null,
           videoUrl: null,
-          animationUrl: "/assets/lotties/11438-starburst-animation.json",
+          animationUrl: "/assets/lotties/10475-drawing-a-love.json",
           webhookUrl: null,
           text: "Thanks for following!",
           textToSpeech: null,
@@ -205,7 +207,8 @@
             mediaSoundVolume: 100,
             cooldown: 0,
             userCooldown: 0,
-            animationUrlOriginalFilename: " starburst animation",
+            audioUrlOriginalFilename: "I Will Always Love You",
+            animationUrlOriginalFilename: " drawing a love",
             isImported: true,
           },
           isDeleted: false,
@@ -213,7 +216,7 @@
           updatedAt: "2024-03-22T23:42:50.000Z",
           context: {
             username: "lazyzerody",
-            nickname: "Zerody",
+            nickname: "✈️🌎HarleenTK♣️♠️🧋",
             giftData: {
               value: 1,
             },
@@ -223,7 +226,7 @@
             totalLikeCount: 100,
             subMonth: 1,
             commandParams: "Test",
-            ttsLanguage: "de-DE",
+            ttsLanguage: "es-US",
             ttsRandomVoice: "de_001",
             thumbnailUrl:
               "https://p16-useast2a.tiktokcdn.com/tos-useast2a-avt-0068-giso/4ec174248f94de26938f73874962469b~c5_1080x1080.jpeg",
@@ -410,7 +413,8 @@
 
       function updateItems() {
         $.get(
-          "https://tikfinity.zerody.one/api/rest/action?channelId=165780&screenId=1&profileId=current&pageSize=1000",
+          //"https://tikfinity.zerody.one/api/rest/action?channelId=165780&screenId=1&profileId=current&pageSize=1000",
+          "/assets/actions.json",
           (resp) => {
             actionItems.forEach((actionItem) => {
               actionItem.destroy();
@@ -441,24 +445,16 @@
 
         var actionInfoToPlay = actionIdQueue.shift();
         var actionIdToPlay = actionInfoToPlay.actionId;
-
-        console.log(actionIdToPlay);
-        console.log(actionItems);
-
         var actionToPlay = actionItems.find((x) => x.id === actionIdToPlay);
 
         if (!actionToPlay) return;
-
-        console.log("jojo20");
 
         currentAction = actionToPlay;
         currentAction.traceStartTs = Date.now();
 
         try {
-          console.log("jojo2");
           actionToPlay.start(actionInfoToPlay.context);
         } catch (err) {
-          console.log("jojo3");
           window.lastError = err;
           throw err;
         }
@@ -494,12 +490,12 @@
           const audioBlob = new Blob([data.buff], {
             type: "audio/mpeg",
           });
-          playlist_1.push(audioBlob);*/
-          console.log("jojo1");
+          playlist_1.push(audioBlob);
           let actionConfig =
             previewActionConfigs[
               Math.floor(Math.random() * previewActionConfigs.length)
-            ];
+            ];*/
+          let actionConfig = previewActionConfigs[0];
           let context = actionConfig.context;
           var hasMediaOnScreen =
             actionConfig.imageUrl ||

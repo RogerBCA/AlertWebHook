@@ -26,7 +26,7 @@ class ActionItem {
         throw new Error("Preload disabled");
       }, 0);
     }
-    window.nothumb = "/static/img/nothumb.webp";
+    window.nothumb = "/assets/img/nothumb.webp";
     if (this.imageUrl && this.imageUrl.indexOf(".json") > 0) {
       this.animationUrl = this.imageUrl;
       this.imageUrl = null;
@@ -253,8 +253,10 @@ class ActionItem {
       text = text.replace(
         "{nickname}",
         (context.nickname || context.username)
+          .replace(/[\W_]+/g, " ")
           .replace(/_/g, " ")
           .replace(/[0-9]/g, " ")
+          .trim()
       );
     }
     return text;
