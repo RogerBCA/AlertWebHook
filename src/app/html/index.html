@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      body {
+        font-family: Arial, Helvetica, sans-serif;
+        overflow: hidden;
+        font-size: 1.3em;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        text-align: center;
+      }
+
+      .hidden {
+        display: none;
+      }
+
+      @keyframes fadeInAnimation {
+        from {
+          opacity: 0;
+          transform: scale(0.1);
+        }
+
+        to {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+
+      @keyframes fadeOutAnimation {
+        from {
+          opacity: 1;
+        }
+
+        to {
+          opacity: 0;
+        }
+      }
+
+      .fadeIn {
+        animation-name: fadeInAnimation;
+        animation-duration: 1s;
+        animation-fill-mode: forwards;
+      }
+
+      .fadeIn_fast {
+        animation-name: fadeInAnimation;
+        animation-duration: 0.2s;
+        animation-fill-mode: forwards;
+      }
+
+      .fadeIn_disabled {
+        animation-name: fadeInAnimation;
+        animation-duration: 0.01s;
+        animation-fill-mode: forwards;
+      }
+
+      .fadeOut {
+        animation-name: fadeOutAnimation;
+        animation-duration: 2s;
+        animation-fill-mode: forwards;
+      }
+
+      .fadeOut_fast {
+        animation-name: fadeOutAnimation;
+        animation-duration: 0.5s;
+        animation-fill-mode: forwards;
+      }
+
+      .fadeOut_disabled {
+        animation-name: fadeOutAnimation;
+        animation-duration: 0.01s;
+        animation-fill-mode: forwards;
+      }
+
+      text {
+        font-weight: bold;
+        font-size: 1.1em;
+
+        -webkit-font-smoothing: antialiased;
+        justify-content: center;
+        align-items: center;
+      }
+
+      text span {
+        position: relative;
+        top: 5px;
+        animation: bounce 0.5s ease infinite alternate;
+        font-size: 1.5em;
+        text-shadow: 0 1px 0 #6e6e6e, 0 2px 0 rgb(199, 199, 199),
+          0 3px 0 rgb(199, 199, 199), 0 4px 0 rgb(199, 199, 199),
+          0 5px 0 rgb(199, 199, 199), 0 6px 0 transparent, 0 7px 0 transparent,
+          0 8px 0 transparent, 0 9px 0 transparent,
+          0 10px 10px rgba(0, 0, 0, 0.4);
+      }
+
+      @keyframes bounce {
+        100% {
+          top: -1px;
+          text-shadow: 0 1px 0 #ccc, 0 2px 0 rgb(138, 138, 138),
+            0 3px 0 rgb(138, 138, 138), 0 4px 0 rgb(138, 138, 138),
+            0 5px 0 rgb(138, 138, 138), 0 6px 0 rgb(138, 138, 138),
+            0 7px 0 rgb(138, 138, 138), 0 8px 0 rgb(138, 138, 138),
+            0 9px 0 rgb(138, 138, 138), 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+      }
+
+      body > img,
+      video,
+      text,
+      lottie-player {
+        max-width: 100%;
+        max-height: 100%;
+        bottom: 0;
+        left: 0;
+        margin: auto;
+        overflow: auto;
+        position: fixed;
+        right: 0;
+        top: 0;
+        -o-object-fit: contain;
+        object-fit: contain;
+        overflow: hidden;
+      }
+
+      /** https://github.com/isaackogan/TikTokWidgets/blob/master/public/index.html */
+      @keyframes wiggle {
+        50% {
+          transform: rotate(-4deg) scale(1.1);
+        }
+      }
+
+      .wiggleEffect {
+        display: inline-block;
+        animation-name: wiggle;
+        animation-duration: 0.5s;
+        animation-iteration-count: infinite;
+      }
+    </style>
+  </head>
+  <body>
+    <img
+      src=""
+      style="display: none; width: 0; height: 0; position: absolute"
+      id="preloadImage"
+    />
+    <script
+      src="https://code.jquery.com/jquery-3.7.1.min.js"
+      integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+      crossorigin="anonymous"
+    ></script>
+    <script>
+      var settings = "";
+      $.getJSON("/static/settings.json", function (data) {
+        settings = data;
+      });
+    </script>
+    <script src="/static/js/mediawrapper.js"></script>
+    <script
+      src="https://cdn.socket.io/4.7.5/socket.io.min.js"
+      integrity="sha384-2huaZvOR9iDzHqslqwpR87isEmrfxqyWOF7hr7BY6KG0+hVKLoEXMPUJw3ynWuhO"
+      crossorigin="anonymous"
+    ></script>
+    <script>
+      var actionItems = [];
+      var actionIdQueue = [];
+      var currentAction = null;
+      var lastStateObj = null;
+      var preloadImageQueue = [];
+
+      let previewActionConfigs = [
+        {
+          id: 586086,
+          channelId: 1,
+          profileId: 3,
+          name: "Follow Alert",
+          screenId: 1,
+          duration: 5,
+          amountToAdd: 0,
+          imageUrl: null,
+          audioUrl: null,
+          videoUrl: null,
+          animationUrl: "/assets/lotties/11438-starburst-animation.json",
+          webhookUrl: null,
+          text: "Thanks for following!",
+          textToSpeech: null,
+          message: null,
+          obsSceneId: null,
+          obsSourceId: null,
+          snapCamEffectId: null,
+          mcCmd: null,
+          keystrokes: null,
+          thirdPartyAction: null,
+          customGoalConfig: null,
+          voicemodVoiceConfig: null,
+          streamerbotActionId: null,
+          enableFadeEffect: true,
+          dynamicConfig: {
+            enableStreaks: false,
+            skipOnNext: false,
+            mediaSoundVolume: 100,
+            cooldown: 0,
+            userCooldown: 0,
+            animationUrlOriginalFilename: " starburst animation",
+            isImported: true,
+          },
+          isDeleted: false,
+          createdAt: "2024-03-22T23:42:50.000Z",
+          updatedAt: "2024-03-22T23:42:50.000Z",
+          context: {
+            username: "lazyzerody",
+            nickname: "Zerody",
+            giftData: {
+              value: 1,
+            },
+            giftName: "Rose",
+            repeatCount: 1,
+            likeCount: 15,
+            totalLikeCount: 100,
+            subMonth: 1,
+            commandParams: "Test",
+            ttsLanguage: "de-DE",
+            ttsRandomVoice: "de_001",
+            thumbnailUrl:
+              "https://p16-useast2a.tiktokcdn.com/tos-useast2a-avt-0068-giso/4ec174248f94de26938f73874962469b~c5_1080x1080.jpeg",
+          },
+        },
+        {
+          id: 585929,
+          channelId: 1,
+          profileId: 3,
+          name: "Gift Alert",
+          screenId: 1,
+          duration: 5,
+          amountToAdd: 0,
+          imageUrl: null,
+          audioUrl: location.href.includes("onStartPage=1")
+            ? null
+            : "https://www.myinstants.com/media/sounds/gold-coins.mp3",
+          videoUrl: null,
+          animationUrl:
+            "https://ynassets.younow.com/gifts/live/LEVEL_RAIN/gift_LEVEL_RAIN_full_lottie.json?1",
+          webhookUrl: null,
+          text: "Thanks for {repeatcount}x {giftname}!",
+          textToSpeech: null,
+          message: null,
+          obsSceneId: null,
+          obsSourceId: null,
+          snapCamEffectId: null,
+          mcCmd: null,
+          keystrokes: null,
+          thirdPartyAction: null,
+          customGoalConfig: null,
+          voicemodVoiceConfig: null,
+          streamerbotActionId: null,
+          enableFadeEffect: true,
+          dynamicConfig: {
+            enableStreaks: false,
+            skipOnNext: false,
+            mediaSoundVolume: 100,
+            cooldown: 0,
+            userCooldown: 0,
+            animationUrlOriginalFilename: "LEVEL_RAIN",
+            audioUrlOriginalFilename: "Falling Coins",
+            isImported: true,
+          },
+          isDeleted: false,
+          createdAt: "2024-03-22T23:42:50.000Z",
+          updatedAt: "2024-03-22T23:42:50.000Z",
+          context: {
+            username: "Jazmin_123",
+            nickname: "Jazmin",
+            giftData: {
+              value: 1,
+            },
+            giftName: "Rose",
+            repeatCount: 1,
+            likeCount: 15,
+            totalLikeCount: 100,
+            subMonth: 1,
+            commandParams: "Test",
+            ttsLanguage: "de-DE",
+            ttsRandomVoice: "de_001",
+            thumbnailUrl:
+              "https://p16-va.tiktokcdn.com/tos-maliva-avt-0068/be24ce4d740ed71745ffa629d29e8b23~c5_100x100.jpeg",
+          },
+        },
+        {
+          id: 585901,
+          channelId: 1,
+          profileId: 3,
+          name: "Like Alert",
+          screenId: 1,
+          duration: 5,
+          amountToAdd: 0,
+          imageUrl: null,
+          audioUrl: null,
+          videoUrl: null,
+          animationUrl:
+            "https://ynassets.younow.com/gifts/live/LIKE_STORM/gift_LIKE_STORM_full_lottie.json?1",
+          webhookUrl: null,
+          text: "Thanks for {totallikecount} Likes!",
+          textToSpeech: null,
+          message: null,
+          obsSceneId: null,
+          obsSourceId: null,
+          snapCamEffectId: null,
+          mcCmd: null,
+          keystrokes: null,
+          thirdPartyAction: null,
+          customGoalConfig: null,
+          voicemodVoiceConfig: null,
+          streamerbotActionId: null,
+          enableFadeEffect: true,
+          dynamicConfig: {
+            enableStreaks: false,
+            skipOnNext: false,
+            mediaSoundVolume: 100,
+            cooldown: 0,
+            userCooldown: 0,
+            animationUrlOriginalFilename: "LIKE_STORM",
+            isImported: true,
+          },
+          isDeleted: false,
+          createdAt: "2024-03-22T23:42:50.000Z",
+          updatedAt: "2024-03-22T23:42:50.000Z",
+          context: {
+            username: "julia123",
+            nickname: "Julia",
+            giftData: {
+              value: 1,
+            },
+            giftName: "Rose",
+            repeatCount: 1,
+            likeCount: 15,
+            totalLikeCount: 100,
+            subMonth: 1,
+            commandParams: "Test",
+            ttsLanguage: "de-DE",
+            ttsRandomVoice: "de_002",
+            thumbnailUrl:
+              "https://p16-sg.tiktokcdn.com/aweme/100x100/tos-alisg-avt-0068/smgb0f6c44d86eff2800f4629638bf94d8b.jpeg",
+          },
+        },
+        {
+          id: 585863,
+          channelId: 1,
+          profileId: 3,
+          name: "Sub Alert",
+          screenId: 1,
+          duration: 12,
+          amountToAdd: 0,
+          imageUrl: null,
+          audioUrl: location.href.includes("onStartPage=1")
+            ? null
+            : "https://www.myinstants.com/media/sounds/notification_alert.mp3",
+          videoUrl: null,
+          animationUrl:
+            "https://ynassets.younow.com/gifts/live/MAKE_IT_RAIN/gift_MAKE_IT_RAIN_full_lottie.json?1",
+          webhookUrl: null,
+          text: "Thanks for subscribing!",
+          textToSpeech: null,
+          message: null,
+          obsSceneId: null,
+          obsSourceId: null,
+          snapCamEffectId: null,
+          mcCmd: null,
+          keystrokes: null,
+          thirdPartyAction: null,
+          customGoalConfig: null,
+          voicemodVoiceConfig: null,
+          streamerbotActionId: null,
+          enableFadeEffect: true,
+          dynamicConfig: {
+            enableStreaks: false,
+            skipOnNext: false,
+            mediaSoundVolume: 100,
+            cooldown: 0,
+            userCooldown: 0,
+            animationUrlOriginalFilename: "MAKE_IT_RAIN",
+            audioUrlOriginalFilename: "Notification Alert",
+            isImported: true,
+          },
+          isDeleted: false,
+          createdAt: "2024-03-22T23:42:50.000Z",
+          updatedAt: "2024-03-22T23:42:50.000Z",
+          context: {
+            username: "cooldude25",
+            nickname: "CoolDude25",
+            giftData: {
+              value: 1,
+            },
+            giftName: "Rose",
+            repeatCount: 1,
+            likeCount: 15,
+            totalLikeCount: 100,
+            subMonth: 1,
+            commandParams: "Test",
+            ttsLanguage: "de-DE",
+            ttsRandomVoice: "de_002",
+            thumbnailUrl:
+              "https://p16-va.tiktokcdn.com/tos-maliva-avt-0068/df547d43121e5fe98d20c63aecbaf5b9~c5_100x100.jpeg",
+          },
+        },
+      ];
+
+      function updateItems() {
+        $.get(
+          "https://tikfinity.zerody.one/api/rest/action?channelId=165780&screenId=1&profileId=current&pageSize=1000",
+          (resp) => {
+            actionItems.forEach((actionItem) => {
+              actionItem.destroy();
+            });
+
+            actionItems = [];
+
+            resp.actions.forEach((actionInfo) => {
+              actionItems.push(new ActionItem(actionInfo));
+            });
+          }
+        );
+      }
+
+      function processQueue() {
+        if (actionIdQueue.length === 0) return;
+
+        if (currentAction && currentAction.fadeoutInProgress) {
+          return;
+        }
+
+        if (currentAction && currentAction.playing) {
+          if (currentAction.dynamicConfig.skipOnNext) {
+            currentAction.scheduleFadeout();
+          }
+          return;
+        }
+
+        var actionInfoToPlay = actionIdQueue.shift();
+        var actionIdToPlay = actionInfoToPlay.actionId;
+
+        console.log(actionIdToPlay);
+        console.log(actionItems);
+
+        var actionToPlay = actionItems.find((x) => x.id === actionIdToPlay);
+
+        if (!actionToPlay) return;
+
+        console.log("jojo20");
+
+        currentAction = actionToPlay;
+        currentAction.traceStartTs = Date.now();
+
+        try {
+          console.log("jojo2");
+          actionToPlay.start(actionInfoToPlay.context);
+        } catch (err) {
+          console.log("jojo3");
+          window.lastError = err;
+          throw err;
+        }
+
+        // buildAndReportStateObject();
+      }
+      $(window).on("load", () => {
+        updateItems();
+        /*
+        const audioElement = document.getElementById("audio_1");
+        const playlist_1 = [];
+
+        function playNextAudio() {
+          console.log("revisando");
+          if (playlist_1.length > 0) {
+            if (audioElement.duration > 0 && !audioElement.paused) {
+              //
+            } else {
+              const audioBlob = playlist_1.shift();
+              audioElement.src = URL.createObjectURL(audioBlob);
+              audioElement.play();
+            }
+          }
+        }*/
+
+        const socket = io();
+
+        socket.on("reproducir", (data) => {
+          /*
+          console.log("Reproduciendo sonido");
+
+          // Convertir buffer a blob
+          const audioBlob = new Blob([data.buff], {
+            type: "audio/mpeg",
+          });
+          playlist_1.push(audioBlob);*/
+          console.log("jojo1");
+          let actionConfig =
+            previewActionConfigs[
+              Math.floor(Math.random() * previewActionConfigs.length)
+            ];
+          let context = actionConfig.context;
+          var hasMediaOnScreen =
+            actionConfig.imageUrl ||
+            actionConfig.audioUrl ||
+            actionConfig.videoUrl ||
+            actionConfig.animationUrl ||
+            actionConfig.text ||
+            actionConfig.textToSpeech;
+          if (!hasMediaOnScreen) return;
+
+          if (
+            actionConfig.text &&
+            context.thumbnailUrl &&
+            preloadImageQueue.length < 30
+          ) {
+            preloadImageQueue.push(context.thumbnailUrl);
+          }
+
+          actionIdQueue.push({ actionId: actionConfig.id, context });
+          processQueue();
+        });
+
+        // setInterval(playNextAudio, 5000);
+        setInterval(processQueue, 100);
+        /*
+        audioElement.addEventListener("ended", (event) => {
+          playNextAudio();
+        });*/
+      });
+
+      let previewIndex = 0;
+      let previewEnabled = true;
+      let previewActions = [];
+
+      window.addEventListener("load", () => {
+        previewActionConfigs.forEach((actionConfig) => {
+          previewActions.push(new ActionItem(actionConfig));
+        });
+      });
+    </script>
+  </body>
+</html>
